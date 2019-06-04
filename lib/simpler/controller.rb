@@ -9,6 +9,8 @@ module Simpler
       @name = extract_name
       @request = Rack::Request.new(env)
       @response = Rack::Response.new
+
+      set_default_headers
     end
 
     def make_response(action)
@@ -17,17 +19,20 @@ module Simpler
 
       send(action)
       write_response
-      set_default_headers
 
       @response.finish
     end
 
-    def params=(input)
-      input.each { |k, v| @request.params[k] = v }
+    def save_input_params(input)
+      @request.params.merge!(input)
     end
 
     def params
       @request.params
+    end
+
+    def headers
+      @response.headers
     end
 
     private

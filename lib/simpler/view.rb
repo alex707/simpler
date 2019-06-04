@@ -1,4 +1,5 @@
 require 'erb'
+require_relative 'view/text_html'
 
 module Simpler
   class View
@@ -10,11 +11,14 @@ module Simpler
     end
 
     def render(binding)
-      template =  if content.nil?
-                    File.read(template_path)
-                  else
-                    content
-                  end
+      template = nil
+      if content
+        template = content
+      else
+        view = content_type.split('/').map(&:capitalize).join.to_sym
+        type = View.constants.include?(view) ? View.const_get(view) : TextHtml
+        template = type.new(controller.name, action, template()).render()
+      end
 
       ERB.new(template).result(binding)
     end
@@ -34,7 +38,7 @@ module Simpler
     end
 
     def content_type
-      @env.header['Content-Type'] if @env.respond_to?(:header)
+      @env['simpler.controller'].response.header['Content-Type']
     end
 
     def content
@@ -43,17 +47,6 @@ module Simpler
 
     def format
       @env['simpler.format']
-    end
-
-    def template_path
-      path = template || [controller.name, action].join('/')
-      type = if content_type.nil? || content_type == 'text/html'
-              'html'
-            else
-              content_type.gsub('text/', '')
-            end
-
-      Simpler.root.join(VIEW_BASE_PATH, "#{path}.#{type}.erb")
     end
 
   end

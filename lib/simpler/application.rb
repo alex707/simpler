@@ -28,9 +28,14 @@ module Simpler
 
     def call(env)
       route = @router.route_for(env)
-      controller = route.controller.new(env)
-      action = route.action
-      controller.params = route.params
+      if route.nil?
+        controller = Simpler::Controller.new(env)
+        action = 'not_found'
+      else
+        controller = route.controller.new(env)
+        action = route.action
+        controller.save_input_params(route.params)
+      end
 
       make_response(controller, action)
     end

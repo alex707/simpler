@@ -8,9 +8,14 @@ class AppLogger
   end
 
   def call(env)
-    r = @app.call(env)
-    log = <<~LOG
-    
+    response = @app.call(env)
+    @logger.info(message(env))
+    response
+  end
+
+  def message(env)
+    <<~LOG
+
       Request:    #{env['REQUEST_METHOD']} #{env['PATH_INFO']}
       Handler:    #{env['simpler.controller'].name}##{env['simpler.action']}
       Parameters: #{env['simpler.controller'].request.params}
@@ -18,7 +23,5 @@ class AppLogger
                   #{env['simpler.controller'].response.content_type}
                   #{env['simpler.template']}
     LOG
-    @logger.info(log)
-    r
   end
 end

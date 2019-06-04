@@ -19,8 +19,7 @@ module Simpler
       method = env['REQUEST_METHOD'].downcase.to_sym
       path = env['PATH_INFO']
 
-      nf = Route.new(:get, '', Simpler.const_get(:Controller), 'not_found')
-      res = @routes.find { |route| route.match?(method, path) } || nf
+      res = @routes.find { |route| route.match?(method, path) }
     end
 
     private
