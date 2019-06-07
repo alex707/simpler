@@ -1,48 +1,25 @@
 require 'erb'
-require_relative 'view/text_html'
+require_relative 'view/html_rendering'
+require_relative 'view/xml_rendering'
+require_relative 'view/plain_rendering'
 
 module Simpler
   class View
 
-    VIEW_BASE_PATH = 'app/views'.freeze
+    RENDERING_CLASSES = { xml: XMLRendering, plain: PlainRendering, html: HTMLRendering }.freeze
 
     def initialize(env)
       @env = env
     end
 
     def render(binding)
-      template = nil
-      if content
-        template = content
-      else
-        view = content_type.split('/').map(&:capitalize).join.to_sym
-        type = View.constants.include?(view) ? View.const_get(view) : TextHtml
-        template = type.new(controller.name, action, template()).render()
-      end
-
-      ERB.new(template).result(binding)
+      rendering_class.new(@env).render(binding)
     end
 
     private
 
-    def controller
-      @env['simpler.controller']
-    end
-
-    def action
-      @env['simpler.action']
-    end
-
-    def template
-      @env['simpler.template']
-    end
-
-    def content_type
-      @env['simpler.controller'].response.header['Content-Type']
-    end
-
-    def content
-      @env['simpler.content']
+    def rendering_class
+      RENDERING_CLASSES[format || :html]
     end
 
     def format

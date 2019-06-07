@@ -11,6 +11,7 @@ module Simpler
       @response = Rack::Response.new
 
       set_default_headers
+      save_input_params(env)
     end
 
     def make_response(action)
@@ -21,10 +22,6 @@ module Simpler
       write_response
 
       @response.finish
-    end
-
-    def save_input_params(input)
-      @request.params.merge!(input)
     end
 
     def params
@@ -43,6 +40,12 @@ module Simpler
 
     def set_default_headers
       @response.headers['Content-Type'] ||= 'text/html'
+    end
+
+    def save_input_params(env)
+      if env['simpler.params']
+        @request.params.merge!(env['simpler.params'])
+      end
     end
 
     def write_response

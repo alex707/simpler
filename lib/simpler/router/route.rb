@@ -25,6 +25,11 @@ module Simpler
         @method == method && parsed
       end
 
+      def save_params(env)
+        env['simpler.params'] = @params
+        self
+      end
+
     end
   end
 end

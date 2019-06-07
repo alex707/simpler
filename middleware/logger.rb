@@ -17,10 +17,10 @@ class AppLogger
     <<~LOG
 
       Request:    #{env['REQUEST_METHOD']} #{env['PATH_INFO']}
-      Handler:    #{env['simpler.controller'].name}##{env['simpler.action']}
-      Parameters: #{env['simpler.controller'].request.params}
-      Response:   #{env['simpler.controller'].response.status}
-                  #{env['simpler.controller'].response.content_type}
+      Handler:    #{env['simpler.controller']&.name}##{env['simpler.action']}
+      Parameters: #{env['simpler.controller']&.request&.params}
+      Response:   #{env['simpler.controller']&.response&.status}
+                  #{env['simpler.controller']&.response&.content_type}
                   #{env['simpler.template']}
     LOG
   end

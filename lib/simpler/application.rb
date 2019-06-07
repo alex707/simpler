@@ -29,15 +29,12 @@ module Simpler
     def call(env)
       route = @router.route_for(env)
       if route.nil?
-        controller = Simpler::Controller.new(env)
-        action = 'not_found'
+        Rack::Response.new(["Not Found\n"], 404, { 'Content-Type' => 'text/plain' })
       else
         controller = route.controller.new(env)
         action = route.action
-        controller.save_input_params(route.params)
+        make_response(controller, action)
       end
-
-      make_response(controller, action)
     end
 
     private
