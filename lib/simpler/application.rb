@@ -29,7 +29,11 @@ module Simpler
     def call(env)
       route = @router.route_for(env)
       if route.nil?
-        Rack::Response.new(["Not Found\n"], 404, { 'Content-Type' => 'text/plain' })
+        Rack::Response.new(
+          ["Not Found\n"],
+          404,
+          { 'Content-Type' => 'text/plain' }
+        ).finish
       else
         controller = route.controller.new(env)
         action = route.action

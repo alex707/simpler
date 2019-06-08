@@ -5,7 +5,7 @@ class TestsController < Simpler::Controller
 
     # render plain: "Plain text response\n"
 
-    # headers['Content-Type'] = 'text/plain'
+    # headers['Content-Type'] = 'text/html'
     # render plain: "Plain text response!\n"
     # status 201
 
@@ -18,7 +18,6 @@ class TestsController < Simpler::Controller
         <body>Don't forget me this weekend!</body>
       </note>
     XML_STR
-    headers['Content-Type'] = 'text/xml'
     render xml: xml
   end
 

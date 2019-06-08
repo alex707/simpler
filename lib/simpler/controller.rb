@@ -3,6 +3,8 @@ require_relative 'view'
 module Simpler
   class Controller
 
+    CONTENT_TYPES = { xml: 'text/xml', plain: 'text/plain', html: 'text/html' }.freeze
+
     attr_reader :name, :request, :response
 
     def initialize(env)
@@ -10,7 +12,6 @@ module Simpler
       @request = Rack::Request.new(env)
       @response = Rack::Response.new
 
-      set_default_headers
       save_input_params(env)
     end
 
@@ -21,6 +22,7 @@ module Simpler
       send(action)
       write_response
 
+      set_default_headers
       @response.finish
     end
 
@@ -38,8 +40,9 @@ module Simpler
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
     end
 
-    def set_default_headers
-      @response.headers['Content-Type'] ||= 'text/html'
+    def set_default_headers(format = :html)
+      content_type = CONTENT_TYPES[format]
+      @response.headers['Content-Type'] ||= content_type if content_type
     end
 
     def save_input_params(env)
@@ -67,15 +70,12 @@ module Simpler
       else
         @request.env['simpler.template'] = template
       end
+
+      set_default_headers(@request.env['simpler.format'])
     end
 
     def status(code)
       @response.status = code
-    end
-
-    def not_found
-      render plain: "Not Found\n"
-      status 404
     end
   end
 end

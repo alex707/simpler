@@ -14,14 +14,23 @@ class AppLogger
   end
 
   def message(env)
-    <<~LOG
+    controller = env['simpler.controller']
+    if controller
+      <<~LOG
 
-      Request:    #{env['REQUEST_METHOD']} #{env['PATH_INFO']}
-      Handler:    #{env['simpler.controller']&.name}##{env['simpler.action']}
-      Parameters: #{env['simpler.controller']&.request&.params}
-      Response:   #{env['simpler.controller']&.response&.status}
-                  #{env['simpler.controller']&.response&.content_type}
-                  #{env['simpler.template']}
-    LOG
+        Request:    #{env['REQUEST_METHOD']} #{env['PATH_INFO']}
+        Handler:    #{controller&.name}##{env['simpler.action']}
+        Parameters: #{controller&.params}
+        Response:   #{env['simpler.template']}
+                    #{controller&.response&.status}
+                    #{controller&.response&.content_type}
+      LOG
+    else
+      <<~LOG
+
+        Request:    #{env['REQUEST_METHOD']} #{env['PATH_INFO']}
+        Response:   #{}
+      LOG
+    end
   end
 end
